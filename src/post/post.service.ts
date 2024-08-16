@@ -4,10 +4,14 @@ import { CreatePostDto, RateDto, UpdatePostDto } from './dto';
 import { FunPost } from './types';
 import { PostRate } from '@prisma/client';
 import { FunComment } from '../comment/types';
+import { AwsService } from '../aws/aws.service';
 
 @Injectable()
 export class PostService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aws: AwsService,
+  ) {}
 
   // TODO: move to util
   getRating(rates: PostRate[]): { likes: number; dislikes: number } {
@@ -24,13 +28,20 @@ export class PostService {
   async create(
     userId: number,
     dto: CreatePostDto,
-    _file?: string, // TODO: Implement it
+    file?: Express.Multer.File,
   ): Promise<FunPost> {
+    let imgUrl;
+
+    if (file) {
+      imgUrl = await this.aws.uploadFile(file.originalname, file);
+    }
+
     const createdPost = await this.prisma.post.create({
       data: {
         title: dto.title,
         description: dto.description,
         userId,
+        imageUrl: imgUrl,
         PostView: { create: { userId } },
       },
     });
@@ -42,14 +53,21 @@ export class PostService {
     postId: number,
     userId: number,
     dto: UpdatePostDto,
-    _file?: string, // TODO: Implement it
+    file?: Express.Multer.File,
   ): Promise<FunPost> {
+    let imgUrl;
+
     const currentPost = await this.prisma.post.findUniqueOrThrow({
       where: { id: postId },
     });
 
     if (currentPost.userId !== userId) {
       throw new ForbiddenException('Access Denined.');
+    }
+
+    if (file) {
+      // TODO: should delete the old image.
+      imgUrl = await this.aws.uploadFile(file.originalname, file);
     }
 
     await this.prisma.postHistory.create({
@@ -65,6 +83,7 @@ export class PostService {
       data: {
         title: dto.title || undefined,
         description: dto.description || undefined,
+        imageUrl: imgUrl,
         userId,
       },
       include: { PostRate: true },

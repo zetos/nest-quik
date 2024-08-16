@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Express } from 'express';
 import { PostService } from './post.service';
@@ -24,6 +25,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @ApiTags('Post')
@@ -51,22 +53,22 @@ export class PostController {
     },
   })
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   createPost(
     @Body() dto: CreatePostDto,
     @GetUser('sub') userId: number,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000 }),
+          new MaxFileSizeValidator({ maxSize: 1e5 }),
           new FileTypeValidator({ fileType: /image\/(jpeg|png|gif)/ }),
         ],
         fileIsRequired: false,
       }),
     )
-    _file?: Express.Multer.File,
+    file?: Express.Multer.File,
   ): Promise<FunPost> {
-    //file.buffer.toString()
-    return this.postService.create(userId, dto);
+    return this.postService.create(userId, dto, file);
   }
 
   @ApiOperation({
@@ -89,6 +91,7 @@ export class PostController {
     },
   })
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
   updatePost(
     @Param('id', ParseIntPipe) postId: number,
     @Body() dto: UpdatePostDto,
@@ -96,15 +99,15 @@ export class PostController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000 }),
+          new MaxFileSizeValidator({ maxSize: 1e5 }),
           new FileTypeValidator({ fileType: /image\/(jpeg|png|gif)/ }),
         ],
         fileIsRequired: false,
       }),
     )
-    _file?: Express.Multer.File,
+    file?: Express.Multer.File,
   ): Promise<FunPost> {
-    return this.postService.update(postId, userId, dto);
+    return this.postService.update(postId, userId, dto, file);
   }
 
   @ApiOperation({

@@ -22,7 +22,7 @@ export class AuthService {
           email,
         },
         {
-          secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
+          secret: this.config.getOrThrow<string>('ACCESS_TOKEN_SECRET'),
           expiresIn: '15m',
         },
       ),
@@ -32,7 +32,7 @@ export class AuthService {
           email,
         },
         {
-          secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+          secret: this.config.getOrThrow<string>('REFRESH_TOKEN_SECRET'),
           expiresIn: '6d',
         },
       ),
@@ -72,7 +72,7 @@ export class AuthService {
   }
 
   async signinLocal(dto: SignInDto): Promise<Tokens> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { email: dto.email },
     });
 
