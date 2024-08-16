@@ -14,8 +14,6 @@ provider:
     REFRESH_TOKEN_SECRET: ${env:REFRESH_TOKEN_SECRET}
     AWS_S3_NAME: ${env:AWS_S3_NAME}
     AWS_S3_REGION: ${env:AWS_S3_REGION}
-    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
 
 package:
   patterns:
@@ -26,8 +24,7 @@ package:
     - '!node_modules/.cache/prisma/**' # only required for Windows
     - '!node_modules/typescript'
     - '!node_modules/aws-sdk/**'
-    - '!node_modules/.pnpm/@prisma*'
-    - '!node_modules/.pnpm/prisma*'
+    - '!node_modules/.pnpm'
 
 functions:
   main:
