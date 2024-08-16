@@ -16,7 +16,7 @@ export class ReportService {
         _count: {
           select: {
             PostView: true,
-            Comment: true,
+            Comment: { where: { wasDeletedByUserWithId: null } },
             PostRate: {
               where: {
                 rating: 'like',
