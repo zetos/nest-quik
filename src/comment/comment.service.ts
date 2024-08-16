@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AwsService } from '../aws/aws.service';
 import { CreateCommentDto, UpdateCommentDto } from './dto';
 import { FunComment } from './types';
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aws: AwsService,
+  ) {}
 
   async create(userId: number, dto: CreateCommentDto): Promise<FunComment> {
     const createdComment = await this.prisma.comment.create({
@@ -21,12 +25,23 @@ export class CommentService {
         userId: true,
         postId: true,
         description: true,
+        post: { select: { user: { select: { email: true, id: true } } } },
       },
     });
 
     // TODO: send email
+    if (userId !== createdComment.post.user.id) {
+      await this.aws.sendEmail(createdComment.post.user.email);
+    }
 
-    return createdComment;
+    return {
+      id: createdComment.id,
+      createdAt: createdComment.createdAt,
+      updatedAt: createdComment.updatedAt,
+      userId: createdComment.userId,
+      postId: createdComment.postId,
+      description: createdComment.description,
+    };
   }
 
   async update(

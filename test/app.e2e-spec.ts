@@ -5,19 +5,22 @@ import { like, notEquals } from 'pactum-matchers';
 import { AppModule } from '../src/app.module';
 import { Tokens } from '../src/auth/types';
 import { SignInDto, SignUpDto } from '../src/auth/dto';
-//import { AuthorizerService } from '../src/authorizer/authorizer.service';
+import { AwsService } from '../src/aws/aws.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  // let prisma: PrismaService;
-  // const authorizerService: AuthorizerService = {
-  //   authorize: () => Promise.resolve(true),
-  // };
+  const awsService: Partial<AwsService> = {
+    uploadFile: jest.fn().mockResolvedValue('https://www.pudim.com.br/'),
+    sendEmail: jest.fn().mockResolvedValue(void 0),
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(AwsService)
+      .useValue(awsService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(

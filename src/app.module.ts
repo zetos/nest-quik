@@ -9,6 +9,7 @@ import { ATokenGuard } from './common/guards';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { ReportModule } from './report/report.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ReportModule } from './report/report.module';
     PostModule,
     CommentModule,
     ReportModule,
+    AwsModule,
   ],
   providers: [
     {
