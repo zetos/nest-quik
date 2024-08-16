@@ -1,0 +1,33 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: zetos3301
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: testing
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: fun-nest-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    ACCESS_TOKEN_SECRET: ${env:ACCESS_TOKEN_SECRET}
+    REFRESH_TOKEN_SECRET: ${env:REFRESH_TOKEN_SECRET}
+
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma' # - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
+    - '!node_modules/.cache/prisma/**' # only required for Windows
+    - '!node_modules/typescript'
+    - '!node_modules/aws-sdk/**'
+    - '!node_modules/.pnpm/@prisma*'
+    - '!node_modules/.pnpm/prisma*'
+
+functions:
+  main:
+    handler: dist/serverless.handler
+    timeout: 9
+    events:
+      - httpApi: '*'
