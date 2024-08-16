@@ -4,13 +4,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SignInDto, SignUpDto } from './dto';
 import { Tokens } from './types';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    // private config: ConfigService,
+    private config: ConfigService,
   ) {}
 
   async getTokens(userId: number, email: string): Promise<Tokens> {
@@ -21,7 +22,7 @@ export class AuthService {
           email,
         },
         {
-          secret: 'at-secret',
+          secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
           expiresIn: '15m',
         },
       ),
@@ -31,7 +32,7 @@ export class AuthService {
           email,
         },
         {
-          secret: 'rt-secret',
+          secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
           expiresIn: '6d',
         },
       ),

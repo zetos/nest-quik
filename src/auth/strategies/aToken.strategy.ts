@@ -3,14 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../types';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ATokenStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'at-secret',
-      //   secretOrKey: config.get<string>('ACCESS_TOKEN_SECRET'),
+      secretOrKey: config.get<string>('ACCESS_TOKEN_SECRET'),
     });
   }
 
