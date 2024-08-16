@@ -70,4 +70,10 @@ jobs:
       - name: Run E2E tests
         env:
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+          ACCESS_TOKEN_SECRET: at-secret
+          REFRESH_TOKEN_SECRET: rt-secret
+          AWS_S3_NAME: your-bucket
+          AWS_S3_REGION: your-region
+          AWS_ACCESS_KEY_ID: your-key
+          AWS_SECRET_ACCESS_KEY: your-secret-key
         run: pnpm test:e2e:ci
