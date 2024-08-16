@@ -35,6 +35,12 @@ export class PrismaExceptionFilter implements ExceptionFilter {
         error: 'Bad Request',
         statusCode: HttpStatus.BAD_REQUEST,
       });
+    } else if (code === 'P2025') {
+      response.status(HttpStatus.NOT_FOUND).json({
+        message: [`Not found.`],
+        error: 'Not Found',
+        statusCode: HttpStatus.NOT_FOUND,
+      });
     } else {
       console.error('Uncaugh PrismaClientKnownRequestError:', code, exception);
 

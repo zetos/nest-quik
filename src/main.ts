@@ -12,10 +12,10 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Simple nest API')
-    .setDescription('A simple nest API')
+    .setTitle('Nest API')
+    .setDescription('A JWT authenticated API to create posts and comments.')
     .setVersion('1.0')
-    .addTag('nest')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

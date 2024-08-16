@@ -13,16 +13,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum postRating {
+  like
+  dislike
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name    String    @db.VarChar(100)
-  hash    String    @db.VarChar(100)
-  email   String    @unique @db.VarChar(191)
-  Post    Post[]
-  Comment Comment[]
+  name     String     @db.VarChar(100)
+  hash     String     @db.VarChar(100)
+  email    String     @unique @db.VarChar(191)
+  hashedRt String?
+  Post     Post[]
+  Comment  Comment[]
+  PostView PostView[]
+  PostRate PostRate[]
 
   @@map("users")
 }
@@ -31,8 +39,6 @@ model Post {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  likes     Int
-  dislikes  Int
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
@@ -45,13 +51,17 @@ model Post {
 
   history PostHistory[]
 
+  PostView PostView[]
+  PostRate PostRate[]
+
   @@map("posts")
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     Int      @id @default(autoincrement())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  wasDeletedByUserWithId Int?
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
@@ -75,6 +85,36 @@ model PostHistory {
   postId      Int?
 
   @@map("postHistory")
+}
+
+model PostView {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("postViews")
+}
+
+model PostRate {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  rating postRating
+
+  @@unique([userId, postId])
+  @@map("postRates")
 }
 
 // User:
