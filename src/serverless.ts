@@ -50,8 +50,6 @@ export const handler: Handler = async (
     ? `/api${event.path}`
     : event.path;
 
-  console.info('>>> current path:', event.path);
-
   server = server ?? (await bootstrap());
   return server(event, context, callback);
 };

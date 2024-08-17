@@ -41,9 +41,6 @@ export class AwsService {
   }
 
   async sendEmail(toAddress: string): Promise<void> {
-    console.info(
-      'Note: SES is on sandbox mode, only verified emails can send/receive emails.',
-    );
     const fromAddress = 'cesar_manoel@hotmail.com';
     const sendEmailCommand = new SendEmailCommand({
       Destination: {
@@ -80,8 +77,9 @@ export class AwsService {
       ],
     });
 
+    // Note: SES is on sandbox mode !!! Only verified emails can send/receive emails.
     await this.sesClient.send(sendEmailCommand).catch((err) => {
-      throw err;
+      console.error('SES ERROR:', err);
     });
   }
 }
