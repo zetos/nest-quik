@@ -129,3 +129,49 @@ describe('fetchRetry', () => {
     expect(utilModule.sleep).not.toHaveBeenCalled();
   });
 });
+
+describe('getRating', () => {
+  it('should return 0 likes and 0 dislikes when the input is an empty array', () => {
+    const rates = [];
+    const result = utilModule.getRating(rates);
+    expect(result).toEqual({ likes: 0, dislikes: 0 });
+  });
+
+  it('should return correct counts for likes and dislikes', () => {
+    const rates: { rating: 'like' | 'dislike' }[] = [
+      { rating: 'like' },
+      { rating: 'dislike' },
+      { rating: 'like' },
+    ];
+    const result = utilModule.getRating(rates);
+    expect(result).toEqual({ likes: 2, dislikes: 1 });
+  });
+
+  it('should return all likes when all ratings are likes', () => {
+    const rates: { rating: 'like' | 'dislike' }[] = [
+      { rating: 'like' },
+      { rating: 'like' },
+      { rating: 'like' },
+    ];
+    const result = utilModule.getRating(rates);
+    expect(result).toEqual({ likes: 3, dislikes: 0 });
+  });
+
+  it('should return all dislikes when all ratings are dislikes', () => {
+    const rates: { rating: 'like' | 'dislike' }[] = [
+      { rating: 'dislike' },
+      { rating: 'dislike' },
+    ];
+    const result = utilModule.getRating(rates);
+    expect(result).toEqual({ likes: 0, dislikes: 2 });
+  });
+
+  it('should handle large arrays of mixed ratings', () => {
+    const rates: { rating: 'like' | 'dislike' }[] = Array(100)
+      .fill({ rating: 'like' })
+      .concat(Array(50).fill({ rating: 'dislike' }));
+
+    const result = utilModule.getRating(rates);
+    expect(result).toEqual({ likes: 100, dislikes: 50 });
+  });
+});

@@ -29,3 +29,15 @@ export const fetchRetry = async (req: Request, i = 0): Promise<Response> => {
   }
   return response;
 };
+
+export const getRating = (
+  rates: { rating: 'like' | 'dislike' }[],
+): { likes: number; dislikes: number } =>
+  rates.reduce(
+    (acc, cur): { likes: number; dislikes: number } => {
+      return cur.rating === 'like'
+        ? { likes: acc.likes + 1, dislikes: acc.dislikes }
+        : { likes: acc.likes, dislikes: acc.dislikes + 1 };
+    },
+    { likes: 0, dislikes: 0 },
+  );

@@ -2,9 +2,9 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto, RateDto, UpdatePostDto } from './dto';
 import { FunPost } from './types';
-import { PostRate } from '@prisma/client';
 import { FunComment } from '../comment/types';
 import { AwsService } from '../aws/aws.service';
+import { getRating } from '../common/util';
 
 @Injectable()
 export class PostService {
@@ -12,18 +12,6 @@ export class PostService {
     private prisma: PrismaService,
     private aws: AwsService,
   ) {}
-
-  // TODO: move to util
-  getRating(rates: PostRate[]): { likes: number; dislikes: number } {
-    return rates.reduce(
-      (acc, cur): { likes: number; dislikes: number } => {
-        return cur.rating === 'like'
-          ? { likes: acc.likes + 1, dislikes: acc.dislikes }
-          : { likes: acc.likes, dislikes: acc.dislikes + 1 };
-      },
-      { likes: 0, dislikes: 0 },
-    );
-  }
 
   async create(
     userId: number,
@@ -97,7 +85,7 @@ export class PostService {
       title: updatedPost.title,
       description: updatedPost.description,
       imageUrl: updatedPost.imageUrl,
-      ...this.getRating(updatedPost.PostRate),
+      ...getRating(updatedPost.PostRate),
     };
   }
 
@@ -137,7 +125,7 @@ export class PostService {
       imageUrl: currentPost.imageUrl,
       comments: currentPost.Comment,
       views: currentPost.PostView.length,
-      ...this.getRating(currentPost.PostRate),
+      ...getRating(currentPost.PostRate),
     };
   }
 
